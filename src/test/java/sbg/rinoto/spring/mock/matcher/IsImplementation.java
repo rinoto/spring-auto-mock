@@ -7,19 +7,19 @@ import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
-public class IsMock<T> extends BaseMatcher<T> {
+public class IsImplementation<T> extends BaseMatcher<T> {
 
 	@Override
 	public boolean matches(Object o) {
 		if (o == null) {
 			return false;
 		}
-		return mockingDetails(o).isMock();
+		return !mockingDetails(o).isMock();
 	}
 
 	@Override
 	public void describeTo(Description description) {
-		description.appendText("a mock instance");
+		description.appendText("a real implementation");
 	}
 
 	/**
@@ -34,8 +34,8 @@ public class IsMock<T> extends BaseMatcher<T> {
 	 * 
 	 */
 	@Factory
-	public static Matcher<Object> isMock() {
-		return new IsMock<Object>();
+	public static Matcher<Object> isImplementation() {
+		return new IsImplementation<Object>();
 	}
 
 }
