@@ -60,7 +60,7 @@ public class AutoMockRegistryProcessorTest {
 
 	@Test
 	public void mockInjectedInTestShouldBeTheSameThanInjectedInDependentClass() {
-		assertThat(interfaceWithoutImpl, sameInstance(classToTest.getInterfaceWithImpl()));
+		assertThat(interfaceWithoutImpl, sameInstance(classToTest.getInterfaceWithoutImpl()));
 	}
 
 }

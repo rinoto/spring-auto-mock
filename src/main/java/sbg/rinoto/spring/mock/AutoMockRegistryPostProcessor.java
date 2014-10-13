@@ -6,41 +6,41 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 
 /**
  * It automagically creates mockito mocks for dependencies not found on the
- * classpath
+ * classpath.
+ * <p>
+ * <h2>Usage</h2>
+ * Register the <code>AutoMockRegistryPostProcessor</code> in your test like
+ * this:
+ * 
+ * <pre>
+ * &#064;ContextConfiguration(classes = { AutoMockRegistryPostProcessor.class, RestOfClasses.class, ... })
+ * &#064;RunWith(SpringJUnit4ClassRunner.class)
+ * public class YourTest {
+ * ...
+ * }
+ * </pre>
+ * <p>
+ * Initially based on the work from Justin Ryan published on <a
+ * href="http://java.dzone.com/tips/automatically-inject-mocks">DZone</a>
  */
 public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
-
-	/**
-	 * Logger variable for all child classes. Uses
-	 * LoggerFactory.getLogger(getClass()) from Commons Logging.
-	 */
-	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-	private final Set<String> mockBeanNames;
-
-	public AutoMockRegistryPostProcessor() {
-		mockBeanNames = new TreeSet<String>();
-	}
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
@@ -66,29 +66,23 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 		for (final FieldDefinition fieldDef : findAllAutoWired(beanClass)) {
 			if (!isBeanAlreadyRegistered(registry, fieldDef)) {
 				registerMockFactoryBeanForField(registry, fieldDef);
-				mockBeanNames.add(fieldDef.name);
-				logger.debug("Automagically mocking " + fieldDef.name);
 			}
 		}
+		// the parents also need to be registered
 		registerMocksForClass(registry, beanClass.getSuperclass());
 
 	}
 
 	private boolean isBeanAlreadyRegistered(BeanDefinitionRegistry registry, FieldDefinition fieldDef) {
-		if (registry.isBeanNameInUse(fieldDef.name)) {
-			return true;
-		}
-		if (DefaultListableBeanFactory.class.isInstance(registry)) {
-			DefaultListableBeanFactory listableBeanFactory = DefaultListableBeanFactory.class.cast(registry);
-			// try {
-			// listableBeanFactory.getBean(fieldDef.type);
-			// return true;
-			// } catch (NoSuchBeanDefinitionException e) {
-			// // ok
-			// }
+		if (ListableBeanFactory.class.isInstance(registry)) {
+			ListableBeanFactory listableBeanFactory = ListableBeanFactory.class.cast(registry);
 			if (listableBeanFactory.getBeanNamesForType(fieldDef.type).length != 0) {
 				return true;
 			}
+		} else if (registry.isBeanNameInUse(fieldDef.name)) {
+			// if BeanDefinitionRegistry doesn't implement ListableBeanFactory,
+			// fall back to name check
+			return true;
 		}
 		return false;
 	}
@@ -164,7 +158,6 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 		public String toString() {
 			return "[name=" + name + ", type=" + type + "]";
 		}
-
 	}
 
 }
