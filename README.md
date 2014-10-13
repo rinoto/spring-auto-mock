@@ -14,7 +14,7 @@ public class YourTest {
 }
 ```
 
-The mocked service can also be injected in your tests. See a usage example in (https://github.com/rinoto/spring-auto-mock/blob/master/src/test/java/sbg/rinoto/spring/mock/AutoMockRegistryProcessorTest.java)
+The mocked service can also be injected in your tests. See a usage example in https://github.com/rinoto/spring-auto-mock/blob/master/src/test/java/sbg/rinoto/spring/mock/AutoMockRegistryProcessorTest.java
 
 ### Idea
-Initially based on the work from Justin Ryan published DZone (http://java.dzone.com/tips/automatically-inject-mocks)
+Initially based on the work from Justin Ryan published [DZone](http://java.dzone.com/tips/automatically-inject-mocks)
