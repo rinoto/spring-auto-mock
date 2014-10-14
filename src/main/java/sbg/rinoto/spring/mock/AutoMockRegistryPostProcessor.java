@@ -10,9 +10,11 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.mockito.Mockito;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -157,6 +159,37 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 		@Override
 		public String toString() {
 			return "[name=" + name + ", type=" + type + "]";
+		}
+	}
+
+	/**
+	 * Factory that creates mock instances based on the <code>type</code>
+	 */
+	public static class MockFactoryBean implements FactoryBean<Object> {
+
+		private Class<?> type;
+
+		public MockFactoryBean() {
+
+		}
+
+		public void setType(final Class<?> type) {
+			this.type = type;
+		}
+
+		@Override
+		public Object getObject() throws Exception {
+			return Mockito.mock(type);
+		}
+
+		@Override
+		public Class<?> getObjectType() {
+			return type;
+		}
+
+		@Override
+		public boolean isSingleton() {
+			return true;
 		}
 	}
 
