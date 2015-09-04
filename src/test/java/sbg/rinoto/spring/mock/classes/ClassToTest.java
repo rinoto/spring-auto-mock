@@ -21,6 +21,9 @@ public class ClassToTest extends AbstractClassToTest {
 	@Inject
 	private InterfaceWithoutImpl interfaceWithoutImpl;
 
+	@Inject
+	private ClassDefinedInConfig classDefinedInConfig;
+
 	public ClassWithImpl getClassWithImpl() {
 		return classWithImpl;
 	}
@@ -35,6 +38,10 @@ public class ClassToTest extends AbstractClassToTest {
 
 	public InterfaceWithImpl getImplForInterfaceWithImpl() {
 		return implForInterfaceWithImpl;
+	}
+
+	public ClassDefinedInConfig getClassDefinedInConfig() {
+		return classDefinedInConfig;
 	}
 
 }
