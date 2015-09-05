@@ -18,9 +18,8 @@ import sbg.rinoto.spring.mock.classes.ConfigClassToTest;
 import sbg.rinoto.spring.mock.classes.ImplForInterfaceWithImpl;
 import sbg.rinoto.spring.mock.classes.InterfaceWithoutImpl;
 
-@ContextConfiguration(classes = { AutoMockRegistryPostProcessor.class,
-		ClassToTest.class, ClassWithImpl.class, ImplForInterfaceWithImpl.class,
-		ConfigClassToTest.class })
+@ContextConfiguration(classes = { AutoMockRegistryPostProcessor.class, ClassToTest.class, ClassWithImpl.class,
+		ImplForInterfaceWithImpl.class, ConfigClassToTest.class })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AutoMockRegistryProcessorTest {
 
@@ -42,8 +41,7 @@ public class AutoMockRegistryProcessorTest {
 
 	@Test
 	public void shouldUseRealImplementationOfInterfaceIfAvailableWhenFieldHasSameNameThanTheImpl() {
-		assertThat(classToTest.getImplForInterfaceWithImpl(),
-				isImplementation());
+		assertThat(classToTest.getImplForInterfaceWithImpl(), isImplementation());
 	}
 
 	@Test
@@ -63,8 +61,7 @@ public class AutoMockRegistryProcessorTest {
 
 	@Test
 	public void mockInjectedInTestShouldBeTheSameThanInjectedInDependentClass() {
-		assertThat(interfaceWithoutImpl,
-				sameInstance(classToTest.getInterfaceWithoutImpl()));
+		assertThat(interfaceWithoutImpl, sameInstance(classToTest.getInterfaceWithoutImpl()));
 	}
 
 	@Test

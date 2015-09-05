@@ -2,6 +2,7 @@ package sbg.rinoto.spring.mock;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.core.type.StandardMethodMetadata;
 
 /**
  * It automagically creates mockito mocks for dependencies not found on the
@@ -48,16 +50,13 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		for (String beanName : registry.getBeanDefinitionNames()) {
 			final BeanDefinition beanDefinition = registry.getBeanDefinition(beanName);
-			final String beanClassName = beanDefinition.getBeanClassName();
-			registerMocksForBean(registry, beanClassName);
+			// final String beanClassName = beanDefinition.getBeanClassName();
+			registerMocksForBean(registry, beanDefinition);
 		}
 	}
 
-	private void registerMocksForBean(BeanDefinitionRegistry registry, final String beanClassName) {
-		if (beanClassName == null) {
-			return;
-		}
-		Class<?> beanClass = getBeanClass(beanClassName);
+	private void registerMocksForBean(BeanDefinitionRegistry registry, final BeanDefinition beanDefinition) {
+		Class<?> beanClass = getBeanClass(beanDefinition);
 		registerMocksForClass(registry, beanClass);
 	}
 
@@ -89,14 +88,40 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 		return false;
 	}
 
-	private Class<?> getBeanClass(final String beanClassName) {
-		Class<?> beanClass;
+	private Class<?> getBeanClass(final BeanDefinition beanDefinition) {
+
+		final String beanClassName = beanDefinition.getBeanClassName();
+		if (beanClassName == null) {
+			return getClassFromMethodMetadata(beanDefinition);
+		}
+
 		try {
-			beanClass = Class.forName(beanClassName);
+			return Class.forName(beanClassName);
 		} catch (ClassNotFoundException ex) {
 			throw new RuntimeException("Class not found for bean: " + beanClassName);
 		}
-		return beanClass;
+	}
+
+	/**
+	 * Case when the Bean is being declared in a @Configuration, and we cannot
+	 * get the BeanClassName directly from the BeanDefinition.
+	 * <p>
+	 * In this case we need to get the class from the IntrospectedMethod in the
+	 * beanDefinition "source"
+	 * 
+	 * @param beanDefinition
+	 * @return
+	 */
+	private Class<?> getClassFromMethodMetadata(final BeanDefinition beanDefinition) {
+		final Object source = beanDefinition.getSource();
+		if (source != null && StandardMethodMetadata.class.isInstance(source)) {
+			final StandardMethodMetadata methodMetadata = StandardMethodMetadata.class.cast(source);
+			final Method introspectedMethod = methodMetadata.getIntrospectedMethod();
+			if (introspectedMethod != null) {
+				return introspectedMethod.getReturnType();
+			}
+		}
+		return null;
 	}
 
 	@Override

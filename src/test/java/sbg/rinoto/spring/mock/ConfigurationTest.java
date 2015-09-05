@@ -15,7 +15,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import sbg.rinoto.spring.mock.ConfigurationTest.SomeConfig;
 
-@ContextConfiguration(classes = { AutoMockRegistryPostProcessor.class, SomeConfig.class }, initializers = AutoMockRegistryPostProcessor.class)
+/**
+ * Test case provided by mibutec to solve #1
+ * https://github.com/rinoto/spring-auto-mock/issues/1
+ * 
+ * @author ruben
+ *
+ */
+@ContextConfiguration(classes = { AutoMockRegistryPostProcessor.class, SomeConfig.class })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ConfigurationTest {
 	@Autowired
