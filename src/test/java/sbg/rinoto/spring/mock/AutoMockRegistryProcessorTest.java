@@ -14,12 +14,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import sbg.rinoto.spring.mock.classes.ClassToTest;
 import sbg.rinoto.spring.mock.classes.ClassWithImpl;
+import sbg.rinoto.spring.mock.classes.ClassWithNamedInClasspath;
 import sbg.rinoto.spring.mock.classes.ConfigClassToTest;
 import sbg.rinoto.spring.mock.classes.ImplForInterfaceWithImpl;
 import sbg.rinoto.spring.mock.classes.InterfaceWithoutImpl;
 
 @ContextConfiguration(classes = { AutoMockRegistryPostProcessor.class, ClassToTest.class, ClassWithImpl.class,
-		ImplForInterfaceWithImpl.class, ConfigClassToTest.class })
+		ImplForInterfaceWithImpl.class, ConfigClassToTest.class, ClassWithNamedInClasspath.class })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AutoMockRegistryProcessorTest {
 
@@ -77,6 +78,16 @@ public class AutoMockRegistryProcessorTest {
 	@Test
 	public void shouldUseRealImplementationOfClassDefinedInConfigurationIfAvailable() {
 		assertThat(classToTest.getClassDefinedInConfig(), isImplementation());
+	}
+
+	@Test
+	public void shouldUseRealImplementationForClassWithNamedAnnotationInClasspath() {
+		assertThat(classToTest.getClassWithNamedInClasspath(), isImplementation());
+	}
+
+	@Test
+	public void shouldUseMockForClassWithNamedAnnotationNotInClasspath() {
+		assertThat(classToTest.getClassWithNamedNotInClasspath(), isMock());
 	}
 
 }

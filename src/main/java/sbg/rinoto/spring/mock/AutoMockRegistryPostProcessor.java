@@ -1,15 +1,15 @@
 package sbg.rinoto.spring.mock;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.mockito.Mockito;
 import org.springframework.beans.BeansException;
@@ -24,6 +24,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.core.type.StandardMethodMetadata;
+import org.springframework.util.ClassUtils;
 
 /**
  * It automagically creates mockito mocks for dependencies not found on the
@@ -45,6 +46,35 @@ import org.springframework.core.type.StandardMethodMetadata;
  * href="http://java.dzone.com/tips/automatically-inject-mocks">DZone</a>
  */
 public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
+
+	// in order to avoid direct dependencies to javax.inject, we load the
+	// classes via name
+	private static final Class<? extends Annotation> JAVAX_INJECT_CLASS = initAnnotation("javax.inject.Inject");
+	private static final Class<? extends Annotation> JAVAX_NAMED_CLASS = initAnnotation("javax.inject.Named");
+	private static final Method VALUE_METHOD_FROM_NAMED = initMethod(JAVAX_NAMED_CLASS, "value");
+
+	@SuppressWarnings("unchecked")
+	private static Class<? extends Annotation> initAnnotation(String className) {
+		try {
+			return (Class<? extends Annotation>) ClassUtils.forName(className,
+					AutoMockRegistryPostProcessor.class.getClassLoader());
+		} catch (ClassNotFoundException e) {
+			// JSR-330 not available, it's ok
+		}
+		return null;
+	}
+
+	private static Method initMethod(Class<? extends Annotation> clazz, String methodName) {
+		if (clazz == null) {
+			return null;
+		}
+		try {
+			return clazz.getMethod(methodName);
+		} catch (NoSuchMethodException | SecurityException e) {
+			throw new IllegalStateException("Annotation " + clazz.getName()
+					+ " is present in classpath, but we cannot inspect the method " + methodName, e);
+		}
+	}
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
@@ -134,11 +164,10 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 		Set<FieldDefinition> nonAutowired = new HashSet<FieldDefinition>();
 		List<Field> declaredFields = Arrays.asList(targetBean.getDeclaredFields());
 		for (Field field : declaredFields) {
-			if (!field.getType().isArray() && !field.getType().isPrimitive()
-					&& (field.isAnnotationPresent(Autowired.class) || field.isAnnotationPresent(Inject.class))) {
+			if (!field.getType().isArray() && !field.getType().isPrimitive() && isAutowiringAnnotationPresent(field)) {
 				String fieldName = field.getName();
-				if (field.isAnnotationPresent(Named.class)) {
-					fieldName = field.getAnnotation(Named.class).value();
+				if (isNamedAnnotationPresent(field)) {
+					fieldName = getValueFromNamedAnnotation(field);
 				}
 				nonAutowired.add(new FieldDefinition(fieldName, field.getType()));
 			}
@@ -146,7 +175,7 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 		// now the constructors
 		Constructor<?>[] constructors = targetBean.getDeclaredConstructors();
 		for (Constructor<?> constructor : constructors) {
-			if (constructor.isAnnotationPresent(Autowired.class) || constructor.isAnnotationPresent(Inject.class)) {
+			if (isAutowiringAnnotationPresent(constructor)) {
 				Class<?>[] typeParameters = constructor.getParameterTypes();
 				for (Class<?> typeParameter : typeParameters) {
 					nonAutowired.add(new FieldDefinition(typeParameter.getSimpleName(), typeParameter));
@@ -154,6 +183,31 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 			}
 		}
 		return nonAutowired;
+	}
+
+	private String getValueFromNamedAnnotation(AnnotatedElement field) {
+		if (VALUE_METHOD_FROM_NAMED == null) {
+			// JSR-330 is not available - it's ok
+			return null;
+		}
+		// field.getAnnotation(JAVAX_NAMED_CLASS).value();
+		final Annotation namedAnnotation = field.getAnnotation(JAVAX_NAMED_CLASS);
+		try {
+			return (String) VALUE_METHOD_FROM_NAMED.invoke(namedAnnotation);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new IllegalStateException(
+					"@Named annotation is present in classpath, but we cannot execute the value() method!", e);
+		}
+	}
+
+	private boolean isNamedAnnotationPresent(AnnotatedElement field) {
+		return JAVAX_NAMED_CLASS != null && VALUE_METHOD_FROM_NAMED != null
+				&& field.isAnnotationPresent(JAVAX_NAMED_CLASS);
+	}
+
+	private boolean isAutowiringAnnotationPresent(AnnotatedElement field) {
+		return field.isAnnotationPresent(Autowired.class)
+				|| (JAVAX_INJECT_CLASS != null && field.isAnnotationPresent(JAVAX_INJECT_CLASS));
 	}
 
 	private void registerMockFactoryBeanForField(final BeanDefinitionRegistry registry, final FieldDefinition fieldDef) {

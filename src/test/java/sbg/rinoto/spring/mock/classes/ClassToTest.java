@@ -1,6 +1,7 @@
 package sbg.rinoto.spring.mock.classes;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,14 @@ public class ClassToTest extends AbstractClassToTest {
 	@Inject
 	private ClassDefinedInConfig classDefinedInConfig;
 
+	@Inject
+	@Named("namedClassNotInCP")
+	private ClassWithNamedNotInClasspath classWithNamedNotInClasspath;
+
+	@Inject
+	@Named("namedClassInCP")
+	private ClassWithNamedInClasspath classWithNamedInClasspath;
+
 	public ClassWithImpl getClassWithImpl() {
 		return classWithImpl;
 	}
@@ -42,6 +51,14 @@ public class ClassToTest extends AbstractClassToTest {
 
 	public ClassDefinedInConfig getClassDefinedInConfig() {
 		return classDefinedInConfig;
+	}
+
+	public ClassWithNamedNotInClasspath getClassWithNamedNotInClasspath() {
+		return classWithNamedNotInClasspath;
+	}
+
+	public ClassWithNamedInClasspath getClassWithNamedInClasspath() {
+		return classWithNamedInClasspath;
 	}
 
 }
