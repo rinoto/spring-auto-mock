@@ -9,7 +9,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mockito.Mockito;
 import org.springframework.beans.BeansException;
@@ -53,6 +55,8 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 	private static final Class<? extends Annotation> JAVAX_NAMED_CLASS = initAnnotation("javax.inject.Named");
 	private static final Method VALUE_METHOD_FROM_NAMED = initMethod(JAVAX_NAMED_CLASS, "value");
 
+	private static final Map<Class<?>, Object> MOCKS = new ConcurrentHashMap<>();
+
 	@SuppressWarnings("unchecked")
 	private static Class<? extends Annotation> initAnnotation(String className) {
 		try {
@@ -78,6 +82,9 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+
+		MOCKS.clear();
+
 		for (String beanName : registry.getBeanDefinitionNames()) {
 			final BeanDefinition beanDefinition = registry.getBeanDefinition(beanName);
 			// final String beanClassName = beanDefinition.getBeanClassName();
@@ -258,7 +265,9 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 
 		@Override
 		public Object getObject() throws Exception {
-			return Mockito.mock(type);
+			final Object mock = Mockito.mock(type);
+			MOCKS.put(type, mock);
+			return mock;
 		}
 
 		@Override
@@ -272,4 +281,21 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 		}
 	}
 
+	/**
+	 * It calls Mockito.reset in all mocks that have been created
+	 */
+	public static void initMocks() {
+		for (Object mock : MOCKS.values()) {
+			Mockito.reset(mock);
+		}
+	}
+
+	/**
+	 * It returned the created mocks
+	 * 
+	 * @return
+	 */
+	public static Map<Class<?>, Object> getCreatedMocks() {
+		return MOCKS;
+	}
 }
