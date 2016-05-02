@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -22,6 +23,7 @@ import sbg.rinoto.spring.mock.classes.InterfaceWithoutImpl;
 @ContextConfiguration(classes = { AutoMockRegistryPostProcessor.class, ClassToTest.class, ClassWithImpl.class,
 		ImplForInterfaceWithImpl.class, ConfigClassToTest.class, ClassWithNamedInClasspath.class })
 @RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext
 public class AutoMockRegistryProcessorTest {
 
 	@Inject

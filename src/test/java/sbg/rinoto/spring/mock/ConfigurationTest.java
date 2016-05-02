@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -24,6 +25,7 @@ import sbg.rinoto.spring.mock.ConfigurationTest.SomeConfig;
  */
 @ContextConfiguration(classes = { AutoMockRegistryPostProcessor.class, SomeConfig.class })
 @RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext
 public class ConfigurationTest {
 	@Autowired
 	private HelloWorld helloWorld;

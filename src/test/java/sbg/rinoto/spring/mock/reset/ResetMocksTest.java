@@ -12,6 +12,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -22,6 +23,7 @@ import sbg.rinoto.spring.mock.classes.InterfaceWithoutImpl;
 @ContextConfiguration(classes = { AutoMockRegistryPostProcessor.class, ClassToTest.class })
 @RunWith(SpringJUnit4ClassRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@DirtiesContext
 public class ResetMocksTest {
 
 	@Inject

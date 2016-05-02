@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.annotation.DirtiesContext;
 
 import sbg.rinoto.spring.mock.AutoMockRegistryPostProcessor;
 import sbg.rinoto.spring.mock.ConfigurationTest.HelloComponent;
@@ -18,6 +19,7 @@ import sbg.rinoto.spring.mock.ConfigurationTest.HelloWorld;
  * @author mibutec
  */
 @RunWith(TestRunner.class)
+@DirtiesContext
 public class WorksWithoutJavaxInjectTest {
 	private HelloWorld helloWorld;
 
