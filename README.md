@@ -1,5 +1,7 @@
 # spring-auto-mock 
 
+[![Build Status](https://travis-ci.org/rinoto/spring-auto-mock.svg?branch=master)](https://travis-ci.org/rinoto/spring-auto-mock)
+
 It automatically injects mockito mocks into your spring services for dependencies that are not found on the classpath (i.e. that are not registered in Spring).
 
 ### Download
