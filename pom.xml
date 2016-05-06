@@ -3,7 +3,7 @@
 	<groupId>com.github.rinoto.spring</groupId>
 	<artifactId>spring-auto-mock</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<name>spring-auto-mock</name>
 
 
