@@ -1,6 +1,6 @@
 # spring-auto-mock 
 
-[![Build Status](https://travis-ci.org/rinoto/spring-auto-mock.svg?branch=master)](https://travis-ci.org/rinoto/spring-auto-mock)
+[![Build Status](https://travis-ci.org/rinoto/spring-auto-mock.svg?branch=master)](https://travis-ci.org/rinoto/spring-auto-mock) [![Coverage Status](https://coveralls.io/repos/github/rinoto/spring-auto-mock/badge.svg?branch=master)](https://coveralls.io/github/rinoto/spring-auto-mock?branch=master)
 
 It automatically injects mockito mocks into your spring services for dependencies that are not found on the classpath (i.e. that are not registered in Spring).
 
