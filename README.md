@@ -2,6 +2,20 @@
 
 It automatically injects mockito mocks into your spring services for dependencies that are not found on the classpath (i.e. that are not registered in Spring).
 
+### Download
+
+Add the test dependency to your project:
+
+```xml
+<dependency>
+    <groupId>com.github.rinoto.spring</groupId>
+    <artifactId>spring-auto-mock</artifactId>
+    <version>0.3</version>
+    <scope>test</scope>
+</dependency>
+```
+
+
 ### Usage
 
 To use it, just register the <code>AutoMockRegistryPostProcessor</code> in your test. E.g.:
