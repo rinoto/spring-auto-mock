@@ -83,6 +83,11 @@ public class AutoMockRegistryProcessorTest {
 	}
 
 	@Test
+	public void shouldInjectMocksInConstructor() {
+		assertThat(classToTest.getClassThatWillBeInjectedInConstructor(), isMock());
+	}
+
+	@Test
 	public void shouldUseRealImplementationForClassWithNamedAnnotationInClasspath() {
 		assertThat(classToTest.getClassWithNamedInClasspath(), isImplementation());
 	}

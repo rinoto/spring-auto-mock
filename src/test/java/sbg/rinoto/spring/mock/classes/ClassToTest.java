@@ -33,6 +33,13 @@ public class ClassToTest extends AbstractClassToTest {
 	@Named("namedClassInCP")
 	private ClassWithNamedInClasspath classWithNamedInClasspath;
 
+	private final ClassThatWillBeInjectedInConstructor classThatWillBeInjectedInConstructor;
+
+	@Inject
+	public ClassToTest(ClassThatWillBeInjectedInConstructor classThatWillBeInjectedInConstructor) {
+		this.classThatWillBeInjectedInConstructor = classThatWillBeInjectedInConstructor;
+	}
+
 	public ClassWithImpl getClassWithImpl() {
 		return classWithImpl;
 	}
@@ -59,6 +66,10 @@ public class ClassToTest extends AbstractClassToTest {
 
 	public ClassWithNamedInClasspath getClassWithNamedInClasspath() {
 		return classWithNamedInClasspath;
+	}
+
+	public ClassThatWillBeInjectedInConstructor getClassThatWillBeInjectedInConstructor() {
+		return classThatWillBeInjectedInConstructor;
 	}
 
 }

@@ -242,10 +242,6 @@ public class AutoMockRegistryPostProcessor implements BeanDefinitionRegistryPost
 			this.type = type;
 		}
 
-		@Override
-		public String toString() {
-			return "[name=" + name + ", type=" + type + "]";
-		}
 	}
 
 	/**

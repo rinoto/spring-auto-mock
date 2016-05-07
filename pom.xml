@@ -4,7 +4,7 @@
 	<groupId>com.github.rinoto.spring</groupId>
 	<artifactId>spring-auto-mock</artifactId>
 	<packaging>jar</packaging>
-	<version>0.3</version>
+	<version>0.4-SNAPSHOT</version>
 	<name>spring-auto-mock</name>
 	<description>Automocks the dependencies in Spring your test magically</description>
 	<url>https://github.com/rinoto/spring-auto-mock</url>

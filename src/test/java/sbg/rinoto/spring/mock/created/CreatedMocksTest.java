@@ -40,7 +40,7 @@ public class CreatedMocksTest {
 	public void shouldReturnCreatedMocks() throws Exception {
 		final Map<Class<?>, Object> createdMocks = AutoMockRegistryPostProcessor.getCreatedMocks();
 
-		assertThat(createdMocks.keySet(), hasSize(6));
+		assertThat(createdMocks.keySet(), hasSize(7));
 		assertThat(createdMocks.keySet(), hasItem(InterfaceWithoutImpl.class));
 	}
 }
